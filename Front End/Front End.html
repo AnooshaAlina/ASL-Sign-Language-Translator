@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SignVision - Translate the Silence</title>
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&family=Space+Grotesk%3Awght%40400%3B500%3B700" onload="this.rel='stylesheet'" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    :root {
+      --primary-color: #0c7ff2;
+      --secondary-color: #1f2937;
+      --accent-color: #00f2ea;
+      --text-primary: #ffffff;
+      --text-secondary: #9cabba;
+      --border-color: #3b4754;
+      --dark-bg: #111418;
+      --dark-surface: #1A1F24;
+      --dark-border: #283039;
+      --dark-text-primary: #FFFFFF;
+      --dark-text-secondary: #9cabba;
+      --dark-accent: #1E293B;
+    }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+    .neon-hover {
+      transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .neon-hover:hover {
+      box-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
+      transform: translateY(-2px);
+    }
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .btn-primary:hover {
+      background-color: rgba(12, 127, 242, 0.8);
+    }
+    .btn-secondary {
+      background: var(--secondary-color);
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .btn-secondary:hover {
+      background-color: rgba(31, 41, 55, 0.8);
+    }
+    .floating-card {
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(12, 127, 242, 0.3);
+      animation: ripple-animation 1s forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple-animation {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(3); opacity: 0; }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b1120;
+      color: #cbd5e1;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 150vw;
+      height: 150vh;
+      background: url('https://i.imgur.com/7QXq6qv.png') repeat; /* Example background texture */
+      background-size: 150px 150px;
+      filter: blur(25px) brightness(0.25) contrast(1.1);
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(40, 40, 40, 0.85);
+      box-shadow: 0 2px 8px rgba(128, 128, 128, 0.3);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #9ca3af;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+    nav a:hover { color: #d1d5db; }
+    .cta {
+      background: linear-gradient(90deg, #6b7280, #9ca3af);
+      border: none;
+      color: #1f2937;
+      padding: 10px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      white-space: nowrap;
+      position: relative;
+      z-index: 10;
+      user-select: none;
+      box-shadow: 0 4px 8px rgba(156, 163, 175, 0.5);
+    }
+    .cta:hover {
+      background: linear-gradient(90deg, #d1d5db, #f3f4f6);
+      color: #111827;
+      box-shadow: 0 6px 15px rgba(209, 213, 219, 0.8);
+      transform: translateY(-2px);
+    }
+    main {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      gap: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 10;
+    }
+    .hero-text {
+      max-width: 520px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+    .hero-text h1 {
+      font-size: 4.5rem;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 12px;
+      color: #9ca3af;
+      line-height: 1.1;
+      user-select: none;
+      text-shadow: 0 0 10px #9ca3af88;
+    }
+    .hero-text p {
+      font-size: 1.2rem;
+      color: #d1d5db;
+      line-height: 1.5;
+      user-select: text;
+      text-shadow: 0 0 6px #000000cc;
+    }
+    .hero-text button {
+      align-self: flex-start;
+      box-shadow: 0 0 15px #9ca3af88;
+    }
+    .hero-image {
+      flex-shrink: 0;
+      width: 400px;
+      max-width: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 120px #9ca3af88;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+      border: 3px solid #4b5563;
+    }
+    footer {
+      padding: 20px 40px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7280;
+      background: rgba(40, 40, 40, 0.85);
+      flex-shrink: 0;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+    }
+    /* Webcam page styles */
+    .webcam-page, .results-page { display: none; }
+    .webcam-page, .results-page {
+      background: var(--dark-bg);
+      color: var(--dark-text-primary);
+      font-family: "Space Grotesk", "Noto Sans", sans-serif;
+    }
+    .webcam-container {
+      position: relative;
+      flex: 1;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .webcam-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .webcam-feed {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      filter: brightness(0.75);
+    }
+    .webcam-sidebar {
+      position: absolute;
+      top: 50%;
+      left: 2rem;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(26, 31, 36, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 20rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .webcam-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .webcam-modal-content {
+      background: var(--dark-surface);
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      max-width: 32rem;
+      width: 100%;
+      transform: scale(0.95);
+      transition: transform 0.3s;
+    }
+    /* Results page styles */
+    .results-container {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .results-card {
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      margin-bottom: 2rem;
+    }
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .results-table th, .results-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    .results-table thead {
+      background: #1b2127;
+      position: sticky;
+      top: 0;
+    }
+    .results-table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+    }
+    .results-table tbody tr:hover {
+      background: #2a3440;
+    }
+    @media (max-width: 900px) {
+      main { padding: 40px 20px; gap: 40px; }
+      .hero-text h1 { font-size: 3.5rem; letter-spacing: 8px; }
+      .hero-text p { font-size: 1rem; }
+      .hero-image { width: 320px; }
+      .webcam-sidebar { width: 16rem; left: 1rem; }
+    }
+    @media (max-width: 600px) {
+      main { flex-direction: column; padding: 30px 20px; gap: 30px; text-align: center; }
+      .hero-text { max-width: 100%; align-items: center; }
+      .hero-text h1 { font-size: 2.8rem; letter-spacing: 6px; }
+      .hero-text p { font-size: 1rem; }
+      .hero-text button { align-self: center; }
+      .hero-image { width: 280px; }
+      .webcam-sidebar { width: calc(100% - 2rem); left: 1rem; top: auto; bottom: 1rem; transform: none; }
+      .results-container { padding: 1rem; }
+      .results-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="home-page">
+    <header class="flex justify-between items-center px-8 py-4 bg-[#1f2937] shadow-md z-50 relative">
+      <div class="flex items-center space-x-3">
+        <span class="text-xl md:text-2xl font-orbitron text-gray-200 tracking-wider select-none">SIGNVISION</span>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" class="text-gray-300 hover:text-white transition active-page" onclick="showPage('home-page')">Home</a>
+        <a href="#" onclick="showPage('webcam-page')" class="text-gray-300 hover:text-white transition">Demo</a>
+        <a href="#" onclick="showPage('results-page')" class="text-gray-300 hover:text-white transition">Result</a>
+        <a href="#about" class="text-gray-300 hover:text-white transition">About</a>
+      </nav>
+      <button onclick="showPage('webcam-page')"
+              class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-100 hover:to-gray-200 text-gray-900 px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+        Try Now
+      </button>
+    </header>
+   <main>
+      <div class="hero-text">
+        <h1>SIGNVISION</h1>
+        <p>Bridge the gap between silence and speech with AI-powered sign translation.</p>
+        <button class="cta" onclick="showPage('webcam-page')">Translate Now</button>
+      </div>
+      <img class="hero-image" src="Avatar Gebärdensprache GIF by Sign Time - SiMAX.gif" alt="AI Sign Avatar" />
+    </main>
+    <footer>
+      © 2025 SignVision. All rights reserved.
+    </footer>
+  </div>
+
+  <div id="webcam-page" class="webcam-page">
+    <header class="flex justify-between items-center px-8 py-4 bg-[#1f2937] shadow-md z-50 relative">
+      <div class="flex items-center space-x-3">
+        <span class="text-xl md:text-2xl font-orbitron text-gray-200 tracking-wider select-none">SIGNVISION</span>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" onclick="showPage('home-page')" class="text-gray-300 hover:text-white transition">Home</a>
+        <a href="#" class="text-gray-300 hover:text-white transition active-page">Demo</a>
+        <a href="#" onclick="showPage('results-page')" class="text-gray-300 hover:text-white transition">Result</a>
+        <a href="#about" class="text-gray-300 hover:text-white transition">About</a>
+      </nav>
+      <button onclick="showPage('results-page')"
+              class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-100 hover:to-gray-200 text-gray-900 px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+        View Results
+      </button>
+    </header>
+    <div class="webcam-container">
+      <div class="webcam-overlay">
+        <img alt="Webcam Feed" class="webcam-feed" id="webcam-feed" src=""/>
+        <div class="absolute inset-0 flex items-center justify-center" id="ripple-container"></div>
+        <div class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 pointer-events-none" id="no-hand-indicator" style="opacity: 0;">
+          <span class="material-symbols-outlined text-7xl text-[var(--primary-color)] animate-pulse">front_hand</span>
+          <p class="mt-2 text-xl font-semibold text-white">No Hand Detected</p>
+        </div>
+      </div>
+      <aside class="webcam-sidebar">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-[var(--dark-text-primary)]">SignVision AI</h2>
+          <span class="text-xs text-[var(--dark-text-secondary)]">FPS: <span id="fps-counter">0</span></span>
+        </div>
+        <div class="space-y-2">
+          <button class="w-full flex items-center justify-center gap-2 bg-[var(--primary-color)] hover:bg-opacity-80 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors" id="start-webcam">
+            <span class="material-symbols-outlined">videocam</span>
+            Start Webcam
+          </button>
+          <button class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors hidden" id="stop-webcam">
+            <span class="material-symbols-outlined">videocam_off</span>
+            Stop Webcam
+          </button>
+        </div>
+        <div class="p-3 bg-[var(--dark-accent)] rounded-lg">
+          <p class="text-sm text-[var(--dark-text-secondary)]">Predicted Gesture:</p>
+          <p class="text-2xl font-bold text-[var(--primary-color)]" id="predicted-gesture">...</p>
+        </div>
+        <div class="p-3 bg-[var(--dark-accent)] rounded-lg h-20 overflow-y-auto">
+          <p class="text-sm text-[var(--dark-text-secondary)]">Autocorrected Sentence:</p>
+          <p class="text-md text-[var(--dark-text-primary)] leading-tight" id="autocorrected-sentence">...</p>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button class="bg-[var(--dark-border)] hover:bg-[var(--dark-accent)] text-[var(--dark-text-primary)] font-medium py-3 rounded-lg transition-colors flex items-center justify-center" id="backspace-key">
+            <span class="material-symbols-outlined">backspace</span>
+          </button>
+          <button class="col-span-2 bg-[var(--dark-border)] hover:bg-[var(--dark-accent)] text-[var(--dark-text-primary)] font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-1" id="space-key">
+            <span class="material-symbols-outlined">space_bar</span> Space
+          </button>
+        </div>
+        <button class="w-full bg-[var(--primary-color)] hover:bg-opacity-80 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2" id="submit-sentence">
+          <span class="material-symbols-outlined">send</span>
+          Submit & Search
+        </button>
+      </aside>
+      <div class="webcam-modal" id="ai-response-modal">
+        <div class="webcam-modal-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-bold text-[var(--dark-text-primary)]">AI Response</h3>
+            <button class="text-[var(--dark-text-secondary)] hover:text-[var(--dark-text-primary)] transition-colors" id="close-modal">
+              <span class="material-symbols-outlined text-3xl">close</span>
+            </button>
+          </div>
+          <div class="max-h-[60vh] overflow-y-auto space-y-3 pr-2">
+            <p class="text-md text-[var(--dark-text-secondary)] leading-relaxed" id="ai-response-content">
+              The AI will generate a response here based on your submitted sentence. This could be a definition, an example, or further information related to the signed concept.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="results-page" class="results-page">
+    <header class="flex justify-between items-center px-8 py-4 bg-[#1f2937] shadow-md z-50 relative">
+      <div class="flex items-center space-x-3">
+        <span class="text-xl md:text-2xl font-orbitron text-gray-200 tracking-wider select-none">SIGNVISION</span>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" onclick="showPage('home-page')" class="text-gray-300 hover:text-white transition">Home</a>
+        <a href="#" onclick="showPage('webcam-page')" class="text-gray-300 hover:text-white transition">Demo</a>
+        <a href="#" class="text-gray-300 hover:text-white transition active-page">Result</a>
+        <a href="#about" class="text-gray-300 hover:text-white transition">About</a>
+      </nav>
+      <button onclick="showPage('webcam-page')"
+              class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-100 hover:to-gray-200 text-gray-900 px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+        New Translation
+      </button>
+    </header>
+    <main class="results-container">
+      <header class="results-header">
+        <h1 class="text-[var(--text-primary)] tracking-tight text-3xl sm:text-4xl font-bold leading-tight">AI Conversation Results</h1>
+        <button class="flex items-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer justify-center overflow-hidden rounded-xl h-12 px-6 btn-primary text-base font-bold leading-normal tracking-[0.015em] neon-hover">
+          <span class="material-icons">download</span>
+          <span class="truncate">Export Transcript</span>
+        </button>
+      </header>
+      <section class="results-card neon-hover">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex flex-col gap-2 flex-1">
+            <h3 class="text-[var(--accent-color)] text-sm font-semibold tracking-wider uppercase">Autocorrected Sentence</h3>
+            <p class="text-[var(--text-primary)] text-lg sm:text-xl font-bold leading-tight" id="results-autocorrected-sentence">...</p>
+            <p class="text-[var(--text-secondary)] text-sm font-normal leading-normal mt-1">This is the sentence you signed and which was autocorrected.</p>
+          </div>
+          <div class="w-full md:w-48 h-32 md:h-auto md:aspect-square bg-center bg-no-repeat bg-cover rounded-lg border border-[var(--border-color)]" style='background-image: url("https://via.placeholder.com/192x128?text=Your+Signed+Sentence+Image");'></div>
+        </div>
+      </section>
+      <section class="results-card neon-hover">
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="flex flex-col gap-2 flex-1">
+            <h3 class="text-[var(--accent-color)] text-sm font-semibold tracking-wider uppercase">DeepSeek AI Response</h3>
+            <p class="text-[var(--text-primary)] text-lg sm:text-xl font-bold leading-tight" id="results-ai-response">
+              The AI will generate a response here based on your submitted sentence.
+            </p>
+            <p class="text-[var(--text-secondary)] text-sm font-normal leading-normal mt-1">DeepSeek AI</p>
+          </div>
+          <div class="w-full md:w-48 h-32 md:h-auto md:aspect-square bg-center bg-no-repeat bg-cover rounded-lg border border-[var(--border-color)]" style='background-image: url("https://via.placeholder.com/192x128?text=AI+Response+Image");'></div>
+        </div>
+      </section>
+      <section class="results-card neon-hover">
+        <h2 class="text-[var(--accent-color)] text-xl sm:text-2xl font-bold leading-tight tracking-[-0.015em] mb-6">Letter Recognition Timeline</h2>
+        <div class="overflow-x-auto rounded-lg border border-[var(--border-color)] max-h-96">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th class="px-4 py-3 text-left text-[var(--text-primary)] text-sm font-medium uppercase tracking-wider">Letter</th>
+                <th class="px-4 py-3 text-left text-[var(--text-primary)] text-sm font-medium uppercase tracking-wider">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--border-color)]" id="letter-timeline-body">
+              </tbody>
+          </table>
+        </div>
+      </section>
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+        <button onclick="showPage('webcam-page')" class="flex items-center gap-2 min-w-[84px] max-w-xs w-full sm:w-auto cursor-pointer justify-center overflow-hidden rounded-xl h-12 px-8 bg-[var(--accent-color)] text-[#111418] text-base font-bold leading-normal tracking-[0.015em] neon-hover hover:shadow-[0_0_25px_var(--accent-color),_0_0_40px_var(--accent-color)]">
+          <span class="material-icons">translate</span>
+          <span class="truncate">Translate Another</span>
+        </button>
+        <button onclick="showPage('home-page')" class="flex items-center gap-2 min-w-[84px] max-w-xs w-full sm:w-auto cursor-pointer justify-center overflow-hidden rounded-xl h-12 px-8 bg-gray-700 text-white text-base font-bold leading-normal tracking-[0.015em] neon-hover hover:shadow-lg">
+          <span class="material-icons">home</span>
+          <span class="truncate">Go Back Home</span>
+        </button>
+      </div>
+    </main>
+  </div>
+  <script>
+    // Page navigation
+    function showPage(pageId) {
+      document.getElementById('home-page').style.display = 'none';
+      document.getElementById('webcam-page').style.display = 'none';
+      document.getElementById('results-page').style.display = 'none';
+      document.getElementById(pageId).style.display = 'block';
+
+      // Update active navigation link
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active-page');
+      });
+      const activeLink = document.querySelector(`nav a[onclick="showPage('${pageId}')"]`);
+      if (activeLink) activeLink.classList.add('active-page');
+
+      // Specific actions for webcam page
+      if (pageId === 'webcam-page') {
+        startWebcamStream(); // Start fetching video and data when on webcam page
+      } else {
+        stopWebcamStream(); // Stop fetching video and data when leaving webcam page
+      }
+      // Update results page content when navigating to it
+      if (pageId === 'results-page') {
+        updateResultsPage();
+      }
+    }
+
+    // Initialize with home page
+    showPage('home-page');
+
+    // --- Webcam Page Functionality ---
+    const webcamFeed = document.getElementById('webcam-feed');
+    const startWebcamBtn = document.getElementById('start-webcam');
+    const stopWebcamBtn = document.getElementById('stop-webcam');
+    const noHandIndicator = document.getElementById('no-hand-indicator');
+    const predictedGestureEl = document.getElementById('predicted-gesture');
+    const autocorrectedSentenceEl = document.getElementById('autocorrected-sentence');
+    const fpsCounter = document.getElementById('fps-counter');
+    const submitSentenceBtn = document.getElementById('submit-sentence');
+    const aiResponseModal = document.getElementById('ai-response-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const aiResponseContent = document.getElementById('ai-response-content');
+    const backspaceKeyBtn = document.getElementById('backspace-key');
+    const spaceKeyBtn = document.getElementById('space-key');
+
+    let fetchPredictionInterval;
+    let currentAutocorrectedSentence = ""; // To store the sentence for the results page
+    let currentAIResponse = ""; // To store the AI response for the results page
+    let currentLetterTimeline = []; // To store letter predictions and timestamps for the results page
+
+    const API_BASE_URL = 'http://127.0.0.1:5000'; // Flask API URL
+
+    async function startWebcamStream() {
+      // Show stop button, hide start button
+      startWebcamBtn.classList.add('hidden');
+      stopWebcamBtn.classList.remove('hidden');
+
+      // Request backend to start webcam capture
+      try {
+        const response = await fetch(`${API_BASE_URL}/start_webcam_backend`, { method: 'POST' });
+        const data = await response.json();
+        if (data.status === 'error') {
+          alert('Error starting webcam: ' + data.message);
+          stopWebcamStream(); // Revert UI if webcam failed to start
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to communicate with backend to start webcam:', error);
+        alert('Could not connect to backend to start webcam. Is the server running?');
+        stopWebcamStream(); // Revert UI
+        return;
+      }
+      
+      // Set the video feed source to the Flask endpoint
+      webcamFeed.src = `${API_BASE_URL}/video_feed`;
+      
+      // Start polling for prediction data
+      if (!fetchPredictionInterval) {
+        fetchPredictionInterval = setInterval(fetchPredictionData, 200); // Fetch data more frequently (e.g., 5 times per second)
+      }
+    }
+
+    async function stopWebcamStream() {
+      // Show start button, hide stop button
+      stopWebcamBtn.classList.add('hidden');
+      startWebcamBtn.classList.remove('hidden');
+
+      // Clear video feed immediately
+      webcamFeed.src = '';
+      
+      // Stop polling for prediction data
+      if (fetchPredictionInterval) {
+        clearInterval(fetchPredictionInterval);
+        fetchPredictionInterval = null;
+      }
+
+      // Request backend to stop webcam capture
+      try {
+        await fetch(`${API_BASE_URL}/stop_webcam_backend`, { method: 'POST' });
+      } catch (error) {
+        console.error('Failed to communicate with backend to stop webcam:', error);
+      }
+
+      // Reset UI elements
+      predictedGestureEl.textContent = '...';
+      autocorrectedSentenceEl.textContent = '...';
+      fpsCounter.textContent = '0';
+      noHandIndicator.style.opacity = '0';
+    }
+
+    async function fetchPredictionData() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/get_prediction`);
+        const data = await response.json();
+        
+        predictedGestureEl.textContent = data.predicted_sign;
+        autocorrectedSentenceEl.textContent = data.autocorrected_sentence;
+        fpsCounter.textContent = data.fps;
+
+        // Show/hide no hand indicator
+        if (data.hand_detected) {
+          noHandIndicator.style.opacity = '0';
+          noHandIndicator.style.pointerEvents = 'none';
+        } else {
+          noHandIndicator.style.opacity = '1';
+          noHandIndicator.style.pointerEvents = 'auto';
+        }
+
+        // Store the current sentence for the results page
+        currentAutocorrectedSentence = data.autocorrected_sentence;
+
+      } catch (error) {
+        console.error('Error fetching prediction data:', error);
+        predictedGestureEl.textContent = 'Error';
+        autocorrectedSentenceEl.textContent = 'Error';
+        fpsCounter.textContent = 'N/A';
+        noHandIndicator.style.opacity = '1'; // Assume error might mean no hand is seen
+        noHandIndicator.style.pointerEvents = 'auto';
+      }
+    }
+
+    startWebcamBtn.addEventListener('click', startWebcamStream);
+    stopWebcamBtn.addEventListener('click', stopWebcamStream);
+
+    submitSentenceBtn.addEventListener('click', async () => {
+      const sentenceToSubmit = autocorrectedSentenceEl.textContent;
+      if (!sentenceToSubmit || sentenceToSubmit.trim() === '...' || sentenceToSubmit.trim() === '') {
+        alert("Please sign a sentence before submitting!");
+        return;
+      }
+
+      aiResponseContent.textContent = "Thinking..."; // Provide immediate feedback
+      aiResponseModal.style.opacity = '1';
+      aiResponseModal.style.pointerEvents = 'auto';
+      aiResponseModal.querySelector('.webcam-modal-content').style.transform = 'scale(1)';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/submit_sentence`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ sentence: sentenceToSubmit }),
+        });
+        const data = await response.json();
+        currentAIResponse = data.ai_response; // Store for results page
+        aiResponseContent.textContent = data.ai_response;
+        autocorrectedSentenceEl.textContent = "..." // Clear displayed sentence after submission
+      } catch (error) {
+        console.error('Error submitting sentence to AI:', error);
+        aiResponseContent.textContent = 'Error getting AI response. Please try again.';
+        currentAIResponse = 'Error getting AI response.';
+      }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      aiResponseModal.style.opacity = '0';
+      aiResponseModal.style.pointerEvents = 'none';
+      aiResponseModal.querySelector('.webcam-modal-content').style.transform = 'scale(0.95)';
+    });
+
+    // Manual actions
+    async function sendManualAction(actionType) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/manual_action`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: actionType }),
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          autocorrectedSentenceEl.textContent = data.autocorrected_sentence;
+          currentAutocorrectedSentence = data.autocorrected_sentence; // Update stored sentence
+        }
+      } catch (error) {
+        console.error(`Error sending ${actionType} action:`, error);
+      }
+    }
+
+    backspaceKeyBtn.addEventListener('click', () => sendManualAction('backspace'));
+    spaceKeyBtn.addEventListener('click', () => sendManualAction('space'));
+
+    // --- Results Page Functionality ---
+    const resultsAutocorrectedSentenceEl = document.getElementById('results-autocorrected-sentence');
+    const resultsAIResponseEl = document.getElementById('results-ai-response');
+    const letterTimelineBody = document.getElementById('letter-timeline-body');
+
+    async function updateResultsPage() {
+        // Fetch the final data for the results page from the backend
+        try {
+            const response = await fetch(`${API_BASE_URL}/get_results_data`);
+            const data = await response.json();
+            
+            currentAutocorrectedSentence = data.autocorrected_sentence || "No sentence translated yet.";
+            currentAIResponse = data.ai_response || "No AI response yet.";
+            currentLetterTimeline = data.letter_timeline || [];
+
+        } catch (error) {
+            console.error('Error fetching results data:', error);
+            currentAutocorrectedSentence = "Error loading sentence.";
+            currentAIResponse = "Error loading AI response.";
+            currentLetterTimeline = [{ letter: "Error", timestamp: "N/A" }];
+        }
+
+        resultsAutocorrectedSentenceEl.textContent = currentAutocorrectedSentence;
+        resultsAIResponseEl.textContent = currentAIResponse;
+
+        letterTimelineBody.innerHTML = ''; // Clear previous entries
+        if (currentLetterTimeline.length > 0) {
+            currentLetterTimeline.forEach(entry => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-[#2a3440]', 'transition-colors');
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-[var(--text-primary)] text-sm font-normal">${entry.letter}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-[var(--text-secondary)] text-sm font-normal">${entry.timestamp}</td>
+                `;
+                letterTimelineBody.appendChild(row);
+            });
+        } else {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="2" class="px-4 py-3 text-center text-[var(--text-secondary)] text-sm">No letters recorded yet.</td>
+            `;
+            letterTimelineBody.appendChild(row);
+        }
+    }
+
+    // Ripple effect (existing functionality)
+    const rippleContainer = document.getElementById('ripple-container');
+    rippleContainer.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      this.appendChild(ripple);
+
+      const diameter = Math.max(this.clientWidth, this.clientHeight);
+      const radius = diameter / 2;
+
+      ripple.style.width = ripple.style.height = `${diameter}px`;
+      ripple.style.left = `${e.clientX - this.offsetLeft - radius}px`;
+      ripple.style.top = `${e.clientY - this.offsetTop - radius}px`;
+
+      ripple.onanimationend = () => {
+        ripple.remove();
+      };
+    });
+
+  </script>
+</body>
+</html>
